@@ -3,55 +3,7 @@ import 'dart:convert';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-
-const imgList = [
-  "https://images.pexels.com/photos/30971782/pexels-photo-30971782.jpeg",
-  "https://images.pexels.com/photos/3174435/pexels-photo-3174435.jpeg",
-  "https://images.pexels.com/photos/33017020/pexels-photo-33017020.jpeg",
-  "https://images.pexels.com/photos/27532726/pexels-photo-27532726.jpeg",
-];
-
-final List<Widget> imageSliders = imgList
-    .map((item) => Container(
-          margin: EdgeInsets.all(5.0),
-          child: ClipRRect(
-              borderRadius: BorderRadius.all(Radius.circular(5.0)),
-              child: Stack(
-                children: <Widget>[
-                  Image.network(item, fit: BoxFit.cover, width: 1000.0),
-                  Positioned(
-                    bottom: 0.0,
-                    left: 0.0,
-                    right: 0.0,
-                    child: Container(
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [
-                            Color.fromARGB(200, 0, 0, 0),
-                            Color.fromARGB(0, 0, 0, 0)
-                          ],
-                          begin: Alignment.bottomCenter,
-                          end: Alignment.topCenter,
-                        ),
-                      ),
-                      padding: EdgeInsets.symmetric(
-                        vertical: 10.0,
-                        horizontal: 20.0,
-                      ),
-                      child: Text(
-                        'No. ${imgList.indexOf(item)} image',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 20.0,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              )),
-        ))
-    .toList();
+import 'package:poporn/movie_detail_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -61,35 +13,118 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  List<dynamic> popularData = [];
+  List<dynamic> nowData = [];
+  List<dynamic> soonData = [];
+
+  List<dynamic> carouselImagesList = [];
+
   @override
   void initState() {
     super.initState();
+    getPopularData();
+    getNowData();
+    getSoonData();
   }
 
-  void getData() async {
+  void getPopularData() async {
     final response = await http
         .get(Uri.parse('https://movies-api.nomadcoders.workers.dev/popular'));
 
     if (response.statusCode == 200) {
-      final jsonData = jsonDecode(response.body);
-      print(jsonData);
+      popularData = jsonDecode(response.body)["results"];
+
+      popularData.asMap().entries.forEach((entry) {
+        var data = entry.value;
+        var image = data["poster_path"];
+
+        carouselImagesList.add("https://image.tmdb.org/t/p/w500/$image}");
+      });
     } else {
       print('요청 실패: ${response.statusCode}');
     }
   }
 
+  void getNowData() async {
+    final response = await http.get(
+        Uri.parse('https://movies-api.nomadcoders.workers.dev/now-playing'));
+
+    if (response.statusCode == 200) {
+      nowData = jsonDecode(response.body)["results"];
+    } else {
+      print('요청 실패: ${response.statusCode}');
+    }
+  }
+
+  void getSoonData() async {
+    final response = await http.get(
+        Uri.parse('https://movies-api.nomadcoders.workers.dev/coming-soon'));
+
+    if (response.statusCode == 200) {
+      soonData = jsonDecode(response.body)["results"];
+    } else {
+      print('요청 실패: ${response.statusCode}');
+    }
+  }
+
+  void onTapCarousel() {
+    Navigator.push(
+      context,
+      MaterialPageRoute<void>(
+        builder: (BuildContext context) => const MovieDetailScreen(),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    final List<Widget> imageSliders = carouselImagesList
+        .map((item) => GestureDetector(
+              onTap: onTapCarousel,
+              child: Container(
+                margin: EdgeInsets.all(5.0),
+                child: ClipRRect(
+                    borderRadius: BorderRadius.all(Radius.circular(5.0)),
+                    child: Stack(
+                      children: <Widget>[
+                        Image.network(item, fit: BoxFit.cover, width: 1000.0),
+                        Positioned(
+                          bottom: 0.0,
+                          left: 0.0,
+                          right: 0.0,
+                          child: Container(
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                colors: [
+                                  Color.fromARGB(200, 0, 0, 0),
+                                  Color.fromARGB(0, 0, 0, 0)
+                                ],
+                                begin: Alignment.bottomCenter,
+                                end: Alignment.topCenter,
+                              ),
+                            ),
+                            padding: EdgeInsets.symmetric(
+                              vertical: 10.0,
+                              horizontal: 20.0,
+                            ),
+                          ),
+                        ),
+                      ],
+                    )),
+              ),
+            ))
+        .toList();
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.black,
         title: Row(
           children: [
-            CircleAvatar(
-              radius: 10,
-              backgroundColor: Colors.white,
+            Icon(
+              Icons.incomplete_circle_outlined,
+              color: Colors.white,
             ),
-            SizedBox(width: 5),
+            SizedBox(width: 6),
             Text(
               "Popcorn",
               style: TextStyle(
@@ -100,6 +135,16 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ],
         ),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 15, top: 5),
+            child: Icon(
+              Icons.account_circle_rounded,
+              color: Colors.white38,
+              size: 26,
+            ),
+          ),
+        ],
         centerTitle: false,
       ),
       body: SafeArea(
@@ -133,13 +178,13 @@ class _HomeScreenState extends State<HomeScreen> {
                   scrollDirection: Axis.horizontal,
                   child: Row(
                     children: [
-                      for (var movie in ["1", "2", "3"])
+                      for (var data in popularData)
                         Row(
                           children: [
-                            Container(
-                              color: Colors.white,
-                              width: 120,
-                              height: 160,
+                            SizedBox(
+                              height: 200,
+                              child: Image.network(
+                                  "https://image.tmdb.org/t/p/w500/${data["poster_path"]}"),
                             ),
                             SizedBox(width: 10),
                           ],
@@ -151,19 +196,37 @@ class _HomeScreenState extends State<HomeScreen> {
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 10),
                   child: Text(
-                    "Now in Popcorn",
+                    "Now Playing",
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.w600,
                       color: Colors.white,
                     ),
+                  ),
+                ),
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: [
+                      for (var data in nowData)
+                        Row(
+                          children: [
+                            SizedBox(
+                              height: 200,
+                              child: Image.network(
+                                  "https://image.tmdb.org/t/p/w500/${data["poster_path"]}"),
+                            ),
+                            SizedBox(width: 10),
+                          ],
+                        ),
+                    ],
                   ),
                 ),
                 SizedBox(height: 20),
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 10),
                   child: Text(
-                    "Soon in Popcorn",
+                    "Coming Soon",
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.w600,
@@ -171,18 +234,25 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
                 ),
-
-                // ElevatedButton(
-                //   onPressed: getData,
-                //   child: Text(
-                //     "button",
-                //     style: TextStyle(
-                //       fontSize: 100,
-                //       color: Colors.white,
-                //       backgroundColor: Colors.red,
-                //     ),
-                //   ),
-                // )
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: [
+                      for (var data in soonData)
+                        Row(
+                          children: [
+                            SizedBox(
+                              height: 200,
+                              child: Image.network(
+                                  "https://image.tmdb.org/t/p/w500/${data["poster_path"]}"),
+                            ),
+                            SizedBox(width: 10),
+                          ],
+                        ),
+                    ],
+                  ),
+                ),
+                SizedBox(height: 20),
               ],
             ),
           ),
