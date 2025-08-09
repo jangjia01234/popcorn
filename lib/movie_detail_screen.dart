@@ -1,7 +1,20 @@
 import 'package:flutter/material.dart';
 
 class MovieDetailScreen extends StatefulWidget {
-  const MovieDetailScreen({super.key});
+  const MovieDetailScreen({
+    super.key,
+    required this.title,
+    required this.poster,
+    required this.rate,
+    required this.overview,
+    required this.genres,
+  });
+
+  final String title;
+  final String poster;
+  final double rate;
+  final String overview;
+  final List genres;
 
   @override
   State<MovieDetailScreen> createState() => _MovieDetailScreenState();
@@ -24,7 +37,7 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
             color: Colors.white,
           ),
           title: Text(
-            "",
+            '',
             style: TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.w800,
@@ -35,6 +48,8 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
           elevation: 0,
         ),
         body: Stack(
+          // TODO: Home에서 넘겨준 데이터로 [장르] 표시
+          // genres(배열)
           children: [
             Container(
               width: double.infinity,
@@ -42,83 +57,97 @@ class _MovieDetailScreenState extends State<MovieDetailScreen> {
                 alignment: Alignment.center,
                 children: [
                   Image.network(
-                    imgList[0],
-                    fit: BoxFit.cover,
+                    widget.poster,
+                    fit: BoxFit.fitWidth,
                   ),
-                  Icon(
-                    Icons.play_circle_outline_rounded,
-                    color: Colors.white60,
-                    size: 60,
-                  ),
+                  // TODO: 하단 흐림 처리
                 ],
               ),
             ),
-            SafeArea(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SizedBox(height: 150),
-                  Padding(
-                    padding: const EdgeInsets.all(15),
-                    child: Column(
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              "Title",
-                              style: TextStyle(
-                                fontSize: 24,
-                                fontWeight: FontWeight.w800,
+            SingleChildScrollView(
+              child: SafeArea(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(height: 480),
+                    Padding(
+                      padding: const EdgeInsets.all(15),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  widget.title,
+                                  style: TextStyle(
+                                    fontSize: 22,
+                                    fontWeight: FontWeight.w800,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
+                              SizedBox(width: 60),
+                              Icon(
+                                Icons.share,
                                 color: Colors.white,
                               ),
-                            ),
-                            Icon(
-                              Icons.share,
+                            ],
+                          ),
+                          SizedBox(height: 20),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Row(
+                                children: [
+                                  Text(
+                                    "✭ ${"${widget.rate}".substring(0, 3)}",
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w600,
+                                      color: Colors.red,
+                                    ),
+                                  ),
+                                  SizedBox(width: 10),
+                                  Text(
+                                    "2022",
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
+                                      color: Colors.white38,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              Text(
+                                "13+",
+                                style: TextStyle(
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: 10),
+                          Text(
+                            widget.overview,
+                            style: TextStyle(
                               color: Colors.white,
                             ),
-                          ],
-                        ),
-                        SizedBox(height: 20),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Row(
-                              children: [
-                                Text(
-                                  "✭ 4.7",
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.w600,
-                                    color: Colors.red,
-                                  ),
-                                ),
-                                SizedBox(width: 10),
-                                Text(
-                                  "2022",
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w600,
-                                    color: Colors.white38,
-                                  ),
-                                ),
-                              ],
+                          ),
+                          SizedBox(height: 40),
+                          Text(
+                            "genre: ${widget.genres}",
+                            style: TextStyle(
+                              fontSize: 20,
+                              color: Colors.white,
                             ),
-                            Text(
-                              "13+",
-                              style: TextStyle(
-                                color: Colors.white,
-                              ),
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 10),
-                        Text("영화의 개요"),
-                        Text("영화의 장르"),
-                      ],
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ],

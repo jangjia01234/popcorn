@@ -67,11 +67,23 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  void onTapCarousel() {
+  void onTapMoviePoster({
+    required String title,
+    required String poster,
+    required double rate,
+    required String overview,
+    required List genres,
+  }) {
     Navigator.push(
       context,
       MaterialPageRoute<void>(
-        builder: (BuildContext context) => const MovieDetailScreen(),
+        builder: (BuildContext context) => MovieDetailScreen(
+          title: title,
+          poster: poster,
+          rate: rate,
+          overview: overview,
+          genres: genres,
+        ),
       ),
     );
   }
@@ -80,7 +92,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     final List<Widget> imageSliders = carouselImagesList
         .map((item) => GestureDetector(
-              onTap: onTapCarousel,
+              // onTap: onTapMoviePoster(title: item.title),
               child: Container(
                 margin: EdgeInsets.all(5.0),
                 child: ClipRRect(
@@ -181,10 +193,22 @@ class _HomeScreenState extends State<HomeScreen> {
                       for (var data in popularData)
                         Row(
                           children: [
-                            SizedBox(
-                              height: 200,
-                              child: Image.network(
-                                  "https://image.tmdb.org/t/p/w500/${data["poster_path"]}"),
+                            GestureDetector(
+                              onTap: () {
+                                onTapMoviePoster(
+                                  title: data['title'],
+                                  poster:
+                                      "https://image.tmdb.org/t/p/w500/${data["poster_path"]}",
+                                  rate: data['vote_average'],
+                                  overview: data['overview'],
+                                  genres: data["genre_ids"],
+                                );
+                              },
+                              child: SizedBox(
+                                height: 200,
+                                child: Image.network(
+                                    "https://image.tmdb.org/t/p/w500/${data["poster_path"]}"),
+                              ),
                             ),
                             SizedBox(width: 10),
                           ],
@@ -211,10 +235,22 @@ class _HomeScreenState extends State<HomeScreen> {
                       for (var data in nowData)
                         Row(
                           children: [
-                            SizedBox(
-                              height: 200,
-                              child: Image.network(
-                                  "https://image.tmdb.org/t/p/w500/${data["poster_path"]}"),
+                            GestureDetector(
+                              onTap: () {
+                                onTapMoviePoster(
+                                  title: data['title'],
+                                  poster:
+                                      "https://image.tmdb.org/t/p/w500/${data["poster_path"]}",
+                                  rate: data['vote_average'],
+                                  overview: data['overview'],
+                                  genres: data["genre_ids"],
+                                );
+                              },
+                              child: SizedBox(
+                                height: 200,
+                                child: Image.network(
+                                    "https://image.tmdb.org/t/p/w500/${data["poster_path"]}"),
+                              ),
                             ),
                             SizedBox(width: 10),
                           ],
@@ -241,10 +277,22 @@ class _HomeScreenState extends State<HomeScreen> {
                       for (var data in soonData)
                         Row(
                           children: [
-                            SizedBox(
-                              height: 200,
-                              child: Image.network(
-                                  "https://image.tmdb.org/t/p/w500/${data["poster_path"]}"),
+                            GestureDetector(
+                              onTap: () {
+                                onTapMoviePoster(
+                                  title: data['title'],
+                                  poster:
+                                      "https://image.tmdb.org/t/p/w500/${data["poster_path"]}",
+                                  rate: data['vote_average'],
+                                  overview: data['overview'],
+                                  genres: data["genre_ids"],
+                                );
+                              },
+                              child: SizedBox(
+                                height: 200,
+                                child: Image.network(
+                                    "https://image.tmdb.org/t/p/w500/${data["poster_path"]}"),
+                              ),
                             ),
                             SizedBox(width: 10),
                           ],
