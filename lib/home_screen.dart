@@ -40,6 +40,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
         carouselImagesList.add("https://image.tmdb.org/t/p/w500/$image}");
       });
+
+      setState(() {});
     } else {
       print('요청 실패: ${response.statusCode}');
     }
@@ -51,6 +53,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     if (response.statusCode == 200) {
       nowData = jsonDecode(response.body)["results"];
+      setState(() {});
     } else {
       print('요청 실패: ${response.statusCode}');
     }
@@ -62,27 +65,34 @@ class _HomeScreenState extends State<HomeScreen> {
 
     if (response.statusCode == 200) {
       soonData = jsonDecode(response.body)["results"];
+      setState(() {});
     } else {
       print('요청 실패: ${response.statusCode}');
     }
   }
 
   void onTapMoviePoster({
+    required int id,
     required String title,
     required String poster,
     required double rate,
     required String overview,
     required List genres,
+    required String year,
+    required int count,
   }) {
     Navigator.push(
       context,
       MaterialPageRoute<void>(
         builder: (BuildContext context) => MovieDetailScreen(
+          id: id,
           title: title,
           poster: poster,
           rate: rate,
           overview: overview,
           genres: genres,
+          year: year,
+          count: count,
         ),
       ),
     );
@@ -174,14 +184,14 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   items: imageSliders,
                 ),
-                SizedBox(height: 20),
+                SizedBox(height: 40),
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 10),
                   child: Text(
                     "Most Popular",
                     style: TextStyle(
                       fontSize: 20,
-                      fontWeight: FontWeight.w600,
+                      fontWeight: FontWeight.w700,
                       color: Colors.white,
                     ),
                   ),
@@ -196,12 +206,15 @@ class _HomeScreenState extends State<HomeScreen> {
                             GestureDetector(
                               onTap: () {
                                 onTapMoviePoster(
+                                  id: data['id'],
                                   title: data['title'],
                                   poster:
                                       "https://image.tmdb.org/t/p/w500/${data["poster_path"]}",
                                   rate: data['vote_average'],
                                   overview: data['overview'],
                                   genres: data["genre_ids"],
+                                  year: data['release_date'],
+                                  count: data['vote_count'],
                                 );
                               },
                               child: SizedBox(
@@ -223,7 +236,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     "Now Playing",
                     style: TextStyle(
                       fontSize: 20,
-                      fontWeight: FontWeight.w600,
+                      fontWeight: FontWeight.w700,
                       color: Colors.white,
                     ),
                   ),
@@ -238,12 +251,15 @@ class _HomeScreenState extends State<HomeScreen> {
                             GestureDetector(
                               onTap: () {
                                 onTapMoviePoster(
+                                  id: data['id'],
                                   title: data['title'],
                                   poster:
                                       "https://image.tmdb.org/t/p/w500/${data["poster_path"]}",
                                   rate: data['vote_average'],
                                   overview: data['overview'],
                                   genres: data["genre_ids"],
+                                  year: data['release_date'],
+                                  count: data['vote_count'],
                                 );
                               },
                               child: SizedBox(
@@ -265,7 +281,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     "Coming Soon",
                     style: TextStyle(
                       fontSize: 20,
-                      fontWeight: FontWeight.w600,
+                      fontWeight: FontWeight.w700,
                       color: Colors.white,
                     ),
                   ),
@@ -280,12 +296,15 @@ class _HomeScreenState extends State<HomeScreen> {
                             GestureDetector(
                               onTap: () {
                                 onTapMoviePoster(
+                                  id: data['id'],
                                   title: data['title'],
                                   poster:
                                       "https://image.tmdb.org/t/p/w500/${data["poster_path"]}",
                                   rate: data['vote_average'],
                                   overview: data['overview'],
                                   genres: data["genre_ids"],
+                                  year: data['release_date'],
+                                  count: data['vote_count'],
                                 );
                               },
                               child: SizedBox(
